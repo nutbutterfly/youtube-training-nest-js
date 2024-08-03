@@ -1,0 +1,34 @@
+networks:
+  app:
+    driver: bridge
+
+services:
+  db:
+    image: mysql:8.0.39
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - app
+    environment:
+      - MYSQL_ROOT_PASSWORD=1234
+      - MYSQL_DATABASE=ma_long_nest
+    restart: always
+
+  backend:
+    image: malongnest:0.0.2
+    container_name: malongnest
+    ports:
+      - "3000:3000"
+    networks:
+      - app
+    environment:
+      - APP_JWT_SECRET=SomeStrongSecret2024
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USERNAME=root
+      - DB_PASSWORD=1234
+      - DB_NAME=ma_long_nest
+    restart: always
+    depends_on:
+      - db
