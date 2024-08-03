@@ -6,17 +6,28 @@ import { AuthGuard } from './config/auth.guard';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtConfig } from './config/jwt.config';
 import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmConfig } from './config/typeorm.config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot(
+      {
+        isGlobal: true
+      }
+    ),
     JwtModule.registerAsync(
       {
         useClass: JwtConfig,
         global: true
       }
     ),
-    AnonymousModule, 
+    TypeOrmModule.forRootAsync(
+      {
+        useClass: TypeOrmConfig
+      }
+    ),
+    AnonymousModule,
     UserModule
   ],
   controllers: [HealthController],

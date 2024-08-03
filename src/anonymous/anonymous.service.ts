@@ -1,34 +1,50 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AnonymousService {
 
   constructor(
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    private configService: ConfigService,
+    private userService: UserService
   ) { }
 
-  register(dto: RegisterDto) {
-    return 'This action will register';
+  async register(dto: RegisterDto) {
+    // genereate password 8 characters
+    const password = Math.random().toString(36).slice(-8);
+
+    const user = await this.userService.create({
+      email: dto.email,
+      password: password,
+      fistName: null,
+      lastName: null
+    });
+
+    return {
+      email: user.email
+    };
   }
 
-  login(dto: LoginDto) {
-    // TODO: replace this mock user with DB query
-    const mockUser = {
-      id: 1,
-      email: 'nat@ma-long-nest.com',
-      password: '1234'
-    };
+  async login(dto: LoginDto) {
+    const user = await this.userService.findByEmail(dto.email);
+    if (!user) {
+      throw new UnauthorizedException();
+    }
 
-    if (dto.email !== mockUser.email || dto.password !== mockUser.password) {
-      return 'Invalid credentials';
+    // compare password
+    const isMatched = await this.userService.matchPassword(dto.password, user.password);
+    if (isMatched === false) {
+      throw new UnauthorizedException();
     }
 
     const payload = {
-      sub: mockUser.id,
-      email: mockUser.email
+      sub: user.id,
+      email: user.email
     };
 
     const token = this.jwtService.sign(payload);
