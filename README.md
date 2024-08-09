@@ -21,4 +21,9 @@ at my YouTube channel https://www.youtube.com/c/NatthaponPinyo
 - Add JWT
 - Add Config Module
 
+## EP 2 (https://www.youtube.com/live/hY5z4PXT8KY)
+- System Environment Variables
+- Database
+- Containerize
+
 # Stay tuned for more episodes...
