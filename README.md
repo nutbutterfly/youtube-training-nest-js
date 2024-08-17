@@ -6,19 +6,17 @@ Live every Saturday 10:00 AM ICT
 
 at my YouTube channel https://www.youtube.com/c/NatthaponPinyo
 
-# Local MySQL Database
+## Local MySQL Database
 
 ```bash
 docker run -d --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=1234 -e MYSQL_DATABASE=ma_long_nest mysql:8.0.39
 ```
 
-# Postman Collection
+## Postman Collection
 
 Import this 
 <a href="">[file](<Ma Long Nest.postman_collection.json>)</a>
 to your Postman app.
-
-# Episodes
 
 ## EP 1 (https://youtube.com/live/PXjndstQNzI)
 - Overview of NestJS
@@ -38,4 +36,4 @@ to your Postman app.
 - Database
 - Containerize
 
-# Stay tuned for more episodes...
+## Stay tuned for more episodes...
