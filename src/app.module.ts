@@ -11,31 +11,25 @@ import { TypeOrmConfig } from './config/typeorm.config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(
-      {
-        isGlobal: true
-      }
-    ),
-    JwtModule.registerAsync(
-      {
-        useClass: JwtConfig,
-        global: true
-      }
-    ),
-    TypeOrmModule.forRootAsync(
-      {
-        useClass: TypeOrmConfig
-      }
-    ),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    JwtModule.registerAsync({
+      useClass: JwtConfig,
+      global: true,
+    }),
+    TypeOrmModule.forRootAsync({
+      useClass: TypeOrmConfig,
+    }),
     AnonymousModule,
-    UserModule
+    UserModule,
   ],
   controllers: [HealthController],
   providers: [
     {
       provide: 'APP_GUARD',
       useClass: AuthGuard,
-    }
+    },
   ],
 })
-export class AppModule { }
+export class AppModule {}

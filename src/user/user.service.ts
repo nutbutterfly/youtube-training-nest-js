@@ -9,15 +9,15 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
-
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>
-  ) {
+    private userRepository: Repository<User>,
+  ) {}
 
-  }
-
-  async matchPassword(rawPassword: string, hashedPassword): Promise<boolean> {
+  async matchPassword(
+    rawPassword: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
     return await bcrypt.compare(rawPassword, hashedPassword);
   }
 
@@ -42,8 +42,8 @@ export class UserService {
   findAll() {
     const option: FindManyOptions<User> = {
       where: {
-        isActive: true
-      }
+        isActive: true,
+      },
     };
 
     return this.userRepository.find(option);
@@ -58,15 +58,16 @@ export class UserService {
   }
 
   update(id: number, dto: UpdateUserDto) {
-    this.userRepository.findOneByOrFail({ id })
-      .then(user => {
+    this.userRepository
+      .findOneByOrFail({ id })
+      .then((user) => {
         // update
-        user.firstName = dto.fistName;
+        user.firstName = dto.firstName;
         user.lastName = dto.lastName;
 
         this.userRepository.save(user);
       })
-      .catch(error => {
+      .catch((error) => {
         Logger.error(error);
       });
   }
