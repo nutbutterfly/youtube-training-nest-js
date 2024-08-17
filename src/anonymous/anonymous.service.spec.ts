@@ -40,7 +40,14 @@ describe('AnonymousService', () => {
   describe('register', () => {
     it('should register a new user', async () => {
       const registerDto: RegisterDto = { email: 'test@example.com' };
-      const user = { id: 1, email: 'test@example.com', password: 'hashedPassword', firstName: '', lastName: '', isActive: true };
+      const user = {
+        id: 1,
+        email: 'test@example.com',
+        password: 'hashedPassword',
+        firstName: '',
+        lastName: '',
+        isActive: true,
+      };
 
       jest.spyOn(userService, 'create').mockResolvedValue(user);
 
@@ -51,26 +58,53 @@ describe('AnonymousService', () => {
 
   describe('login', () => {
     it('should throw UnauthorizedException if user is not found', async () => {
-      const loginDto: LoginDto = { email: 'test@example.com', password: 'password' };
+      const loginDto: LoginDto = {
+        email: 'test@example.com',
+        password: 'password',
+      };
 
       jest.spyOn(userService, 'findByEmail').mockResolvedValue(null);
 
-      await expect(service.login(loginDto)).rejects.toThrow(UnauthorizedException);
+      await expect(service.login(loginDto)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should throw UnauthorizedException if password does not match', async () => {
-      const loginDto: LoginDto = { email: 'test@example.com', password: 'password' };
-      const user = { id: 0, email: 'test@example.com', password: 'hashedPassword', firstName: 'John', lastName: 'Doe', isActive: true };
+      const loginDto: LoginDto = {
+        email: 'test@example.com',
+        password: 'password',
+      };
+      const user = {
+        id: 0,
+        email: 'test@example.com',
+        password: 'hashedPassword',
+        firstName: 'John',
+        lastName: 'Doe',
+        isActive: true,
+      };
 
       jest.spyOn(userService, 'findByEmail').mockResolvedValue(user);
       jest.spyOn(userService, 'matchPassword').mockResolvedValue(false);
 
-      await expect(service.login(loginDto)).rejects.toThrow(UnauthorizedException);
+      await expect(service.login(loginDto)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should return a JWT token if login is successful', async () => {
-      const loginDto: LoginDto = { email: 'test@example.com', password: 'password' };
-      const user = { id: 0, email: 'test@example.com', password: 'hashedPassword', firstName: 'John', lastName: 'Doe', isActive: true };
+      const loginDto: LoginDto = {
+        email: 'test@example.com',
+        password: 'password',
+      };
+      const user = {
+        id: 0,
+        email: 'test@example.com',
+        password: 'hashedPassword',
+        firstName: 'John',
+        lastName: 'Doe',
+        isActive: true,
+      };
       const access_token = 'jwtToken';
 
       jest.spyOn(userService, 'findByEmail').mockResolvedValue(user);
@@ -79,8 +113,14 @@ describe('AnonymousService', () => {
 
       expect(await service.login(loginDto)).toEqual({ access_token });
       expect(userService.findByEmail).toHaveBeenCalledWith(loginDto.email);
-      expect(userService.matchPassword).toHaveBeenCalledWith(loginDto.password, user.password);
-      expect(jwtService.sign).toHaveBeenCalledWith({ sub: user.id, email: user.email });
+      expect(userService.matchPassword).toHaveBeenCalledWith(
+        loginDto.password,
+        user.password,
+      );
+      expect(jwtService.sign).toHaveBeenCalledWith({
+        sub: user.id,
+        email: user.email,
+      });
     });
   });
 });

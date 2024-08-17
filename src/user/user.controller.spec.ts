@@ -27,7 +27,12 @@ describe('UserController', () => {
 
   describe('create', () => {
     it('should call userService.create with correct parameters', async () => {
-      const createUserDto: CreateUserDto = { email: 'test@example.com', password: 'password', firstName: 'John', lastName: 'Doe' };
+      const createUserDto: CreateUserDto = {
+        email: 'test@example.com',
+        password: 'password',
+        firstName: 'John',
+        lastName: 'Doe',
+      };
       const result = { id: 1, isActive: true, ...createUserDto };
 
       jest.spyOn(userService, 'create').mockResolvedValue(result);
@@ -39,7 +44,16 @@ describe('UserController', () => {
 
   describe('findAll', () => {
     it('should call userService.findAll and return the result', async () => {
-      const result = [{ id: 1, email: 'test@example.com', password: 'password', firstName: 'John', lastName: 'Doe', isActive: true }];
+      const result = [
+        {
+          id: 1,
+          email: 'test@example.com',
+          password: 'password',
+          firstName: 'John',
+          lastName: 'Doe',
+          isActive: true,
+        },
+      ];
 
       jest.spyOn(userService, 'findAll').mockResolvedValue(result);
 
