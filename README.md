@@ -31,9 +31,12 @@ to your Postman app.
 - Add JWT
 - Add Config Module
 
-## EP 2 (https://www.youtube.com/live/hY5z4PXT8KY)
+## EP 2 (https://youtube.com/live/hY5z4PXT8KY)
 - System Environment Variables
 - Database
 - Containerize
+
+## EP 3 (https://youtube.com/live/dH2viYCGWXw)
+- Unit Testing with Jest
 
 ## Stay tuned for more episodes...
