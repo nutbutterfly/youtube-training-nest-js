@@ -6,6 +6,12 @@ Live every Saturday 10:00 AM ICT
 
 at my YouTube channel https://www.youtube.com/c/NatthaponPinyo
 
+# Local MySQL Database
+
+```bash
+docker run -d --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=1234 -e MYSQL_DATABASE=ma_long_nest mysql:8.0.39
+```
+
 # Episodes
 
 ## EP 1 (https://youtube.com/live/PXjndstQNzI)
