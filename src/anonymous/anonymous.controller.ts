@@ -10,7 +10,7 @@ import {
 import { AnonymousService } from './anonymous.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { Public } from 'src/config/public.decorator';
+import { Public } from '../config/public.decorator';
 
 @Controller('anonymous')
 export class AnonymousController {
