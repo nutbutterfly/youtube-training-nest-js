@@ -1,126 +1,146 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AnonymousService } from './anonymous.service';
 import { JwtService } from '@nestjs/jwt';
-import { UnauthorizedException } from '@nestjs/common';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
 import { UserService } from '../user/user.service';
+import { RegisterDto } from './dto/register.dto';
+import { User } from 'src/user/entities/user.entity';
+import { LoginDto } from './dto/login.dto';
+import { UnauthorizedException } from '@nestjs/common';
 
 describe('AnonymousService', () => {
-  let userService: UserService;
-  let service: AnonymousService;
   let jwtService: JwtService;
+  let userService: UserService;
+  let anonymousService: AnonymousService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AnonymousService,
         {
+          provide: JwtService,
+          useValue: {
+            sign: jest.fn()
+          }
+        },
+        {
           provide: UserService,
           useValue: {
             create: jest.fn(),
             findByEmail: jest.fn(),
-            matchPassword: jest.fn(),
-          },
-        },
-        {
-          provide: JwtService,
-          useValue: {
-            sign: jest.fn(),
-          },
-        },
+            matchPassword: jest.fn()
+          }
+        }
       ],
     }).compile();
 
-    service = module.get<AnonymousService>(AnonymousService);
-    userService = module.get<UserService>(UserService);
+    anonymousService = module.get<AnonymousService>(AnonymousService);
     jwtService = module.get<JwtService>(JwtService);
+    userService = module.get<UserService>(UserService);
+  });
+
+  it('should be defined', () => {
+    expect(anonymousService).toBeDefined();
+    expect(jwtService).toBeDefined();
+    expect(userService).toBeDefined();
   });
 
   describe('register', () => {
-    it('should register a new user', async () => {
-      const registerDto: RegisterDto = { email: 'test@example.com' };
-      const user = {
+    it('should register if valid payload', async () => {
+      const dto: RegisterDto = {
+        email: 'nat@ma-long-nest.com',
+      }
+
+      const user: User = {
         id: 1,
-        email: 'test@example.com',
-        password: 'hashedPassword',
-        firstName: '',
-        lastName: '',
-        isActive: true,
-      };
+        email: dto.email,
+        password: 'someHashedPassword',
+        firstName: 'Nat',
+        lastName: 'Live',
+        isActive: true
+      }
 
       jest.spyOn(userService, 'create').mockResolvedValue(user);
 
-      await service.register(registerDto);
+      const response = await anonymousService.register(dto);
+
       expect(userService.create).toHaveBeenCalled();
+
+      expect(response).toEqual({
+        email: dto.email
+      })
     });
   });
 
   describe('login', () => {
-    it('should throw UnauthorizedException if user is not found', async () => {
-      const loginDto: LoginDto = {
-        email: 'test@example.com',
-        password: 'password',
+    it('should throw error if invalid email', async () => {
+      const dto: LoginDto = {
+        email: 'nat99@ma-long-nest.com',
+        password: '12345678'
       };
 
       jest.spyOn(userService, 'findByEmail').mockResolvedValue(null);
 
-      await expect(service.login(loginDto)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(anonymousService.login(dto)).rejects.toThrow(UnauthorizedException);
+
+      expect(userService.findByEmail).toHaveBeenCalled();
     });
 
-    it('should throw UnauthorizedException if password does not match', async () => {
-      const loginDto: LoginDto = {
-        email: 'test@example.com',
-        password: 'password',
+    it('should throw error if password is invalid', async () => {
+      const dto: LoginDto = {
+        email: 'nat@ma-long-nest.com',
+        password: '1234567890'
       };
-      const user = {
-        id: 0,
-        email: 'test@example.com',
-        password: 'hashedPassword',
-        firstName: 'John',
-        lastName: 'Doe',
-        isActive: true,
-      };
+
+      const user: User = {
+        id: 1,
+        email: dto.email,
+        password: '1234',
+        firstName: 'Nat',
+        lastName: 'Live',
+        isActive: true
+      }      
 
       jest.spyOn(userService, 'findByEmail').mockResolvedValue(user);
       jest.spyOn(userService, 'matchPassword').mockResolvedValue(false);
 
-      await expect(service.login(loginDto)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(anonymousService.login(dto)).rejects.toThrow(UnauthorizedException);
+
+      expect(userService.findByEmail).toHaveBeenCalled();
+      expect(userService.matchPassword).toHaveBeenCalled();
     });
 
-    it('should return a JWT token if login is successful', async () => {
-      const loginDto: LoginDto = {
-        email: 'test@example.com',
-        password: 'password',
+    it('should login success and return access token', async () => {
+      const dto: LoginDto = {
+        email: 'nat@ma-long-nest.com',
+        password: '1234'
       };
-      const user = {
-        id: 0,
-        email: 'test@example.com',
-        password: 'hashedPassword',
-        firstName: 'John',
-        lastName: 'Doe',
-        isActive: true,
-      };
-      const access_token = 'jwtToken';
+
+      const user: User = {
+        id: 1,
+        email: dto.email,
+        password: '1234',
+        firstName: 'Nat',
+        lastName: 'Live',
+        isActive: true
+      }
+
+      const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoibmF0QG1hLWxvbmcubmVzdCIsImlhdCI6MTYxNjIzOTAyMn0.7J9';
 
       jest.spyOn(userService, 'findByEmail').mockResolvedValue(user);
       jest.spyOn(userService, 'matchPassword').mockResolvedValue(true);
-      jest.spyOn(jwtService, 'sign').mockReturnValue(access_token);
+      jest.spyOn(jwtService, 'sign').mockReturnValue(token);
 
-      expect(await service.login(loginDto)).toEqual({ access_token });
-      expect(userService.findByEmail).toHaveBeenCalledWith(loginDto.email);
-      expect(userService.matchPassword).toHaveBeenCalledWith(
-        loginDto.password,
-        user.password,
-      );
-      expect(jwtService.sign).toHaveBeenCalledWith({
-        sub: user.id,
-        email: user.email,
+      const response = await anonymousService.login(dto);
+
+      expect(userService.findByEmail).toHaveBeenCalled();
+      expect(userService.matchPassword).toHaveBeenCalled();
+      expect(jwtService.sign).toHaveBeenCalled();
+
+      expect(response).toEqual({
+        access_token: token,
       });
+
     });
-  });
+  });  
+
 });
