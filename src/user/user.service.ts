@@ -57,7 +57,7 @@ export class UserService {
     return this.userRepository.findOneBy({ email });
   }
 
-  update(id: number, dto: UpdateUserDto) {
+  async update(id: number, dto: UpdateUserDto) {
     this.userRepository
       .findOneByOrFail({ id })
       .then((user) => {
